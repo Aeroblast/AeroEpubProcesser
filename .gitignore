@@ -1,0 +1,4 @@
+*.epub
+obj
+bin
+test*
