@@ -3,8 +3,8 @@
 
 兼容目标为Apple Books, Microsoft Edge(EdgeHTML), 多看, Kindlegen
 
-# 会做什么？
-将会进行一些处理，使epub文档的弹出式注释能在各个平台上正常工作
+# 这个类会做什么？
+将会进行一些处理，使epub文档的弹出式注释能在各个平台上正常工作。有两种选项，一个是主流平台（Apple Books, Microsoft Edge(EdgeHTML)，Kindlegen），一个是主流平台+多看
 ## 注释链接
 类似这样的代码：
 
@@ -45,6 +45,7 @@
 ```
 
 将会被修改为类似这样的代码：
+兼容多看
 ```
 <aside epub:type="footnote" id="note1">
 <a href="#note1_ref"></a>
@@ -52,6 +53,15 @@
 <li class="duokan-footnote-item" id="note1">
 注释本体
 </li></ol></aside>
+```
+或
+不兼容多看
+```
+<aside epub:type="footnote" id="note1">
+<a href="#note1_ref"></a>
+<p class="ae_note_inside">
+注释本体
+</p></aside>
 ```
 
 ## 检查命名空间xmlns:epub
