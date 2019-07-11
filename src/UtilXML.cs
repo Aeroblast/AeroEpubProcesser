@@ -17,19 +17,19 @@ namespace AeroEpubProcesser
             {
                 r += parts[i].originalText.Length;
             }
-            return r+indexInSource;
+            return r + indexInSource;
         }
         public XFragment(string text, int start)
         {
-            if (text[start] != '<') throw new System.Exception("XFragment Error:Unexpect Start.");
-            indexInSource=start;
+            if (text[start] != '<') throw new XMLException("XFragment Error:Unexpect Start.");
+            indexInSource = start;
             Regex reg_tag = new Regex("<.*?>");
             int count = 0, pos = start;
             Match m;
             do
             {
                 m = reg_tag.Match(text, pos);
-                if (!m.Success) { throw new System.Exception("XFragment Error:Unexpect end."); }
+                if (!m.Success) { new XMLException("XFragment Error:Unexpect end."); }
                 XTag tag = new XTag(m.Value);
                 if (tag.type == PartType.tag_start) count++;
                 if (tag.type == PartType.tag_end) count--;
@@ -54,8 +54,8 @@ namespace AeroEpubProcesser
         }
         public void Apply(ref string text)
         {
-            text=text.Remove(indexInSource,originalLength);
-            text=text.Insert(indexInSource,root.ToString());
+            text = text.Remove(indexInSource, originalLength);
+            text = text.Insert(indexInSource, root.ToString());
 
         }
 
@@ -81,13 +81,18 @@ namespace AeroEpubProcesser
         List<XAttribute> attributes { get { return tag.attributes; } }
         XFragment doc;
         public int tagStartRef, tagEndRef = -1;
-        
+
         public List<XELement> childs = new List<XELement>();
         public XELement parent;
         public XELement(XFragment frag, int start)
         {
             doc = frag;
             this.tagStartRef = start;
+            if (doc.parts[tagStartRef].type == PartType.tag_single)
+            {
+                this.tagEndRef = start;
+                return;
+            }
             for (int i = start + 1; i < doc.parts.Count; i++)
             {
                 if (doc.parts[i].type == PartType.tag_start)
@@ -105,11 +110,11 @@ namespace AeroEpubProcesser
                     }
                     else
                     {
-                        Log.log("Error:dismatched end tag");
+                        throw new XMLException("dismatched end tag");
                     }
                 }
             }
-            if (tagEndRef == -1) Log.log("Error:Closing Tag Failure.");
+            if (tagEndRef == -1) throw new XMLException("Failure when close tag.");
         }
         public string innerXHTML
         {
@@ -127,7 +132,9 @@ namespace AeroEpubProcesser
         {
             get
             {
-                return doc.parts[tagStartRef].ToString()+innerXHTML+doc.parts[tagEndRef].ToString();
+                if (doc.parts[tagStartRef].type == PartType.tag_single) return doc.parts[tagStartRef].ToString();
+                else
+                    return doc.parts[tagStartRef].ToString() + innerXHTML + doc.parts[tagEndRef].ToString();
             }
         }
         public override string ToString()
@@ -172,7 +179,7 @@ namespace AeroEpubProcesser
             Match m = reg1.Match(text, pos);
             if (m.Success)
             {
-                m=reg2.Match(text,m.Index);
+                m = reg2.Match(text, m.Index);
                 XTag tag = new XTag(m.Value);
                 pos = m.Index;
                 return tag;
@@ -181,8 +188,8 @@ namespace AeroEpubProcesser
         }
         public static XTag FindTag(string tagName, string text)
         {
-            int i=0;
-            return FindTag(tagName,text,ref i);
+            int i = 0;
+            return FindTag(tagName, text, ref i);
         }
 
         public string tagname;
@@ -198,7 +205,6 @@ namespace AeroEpubProcesser
         }
         public void SetAttribute(string name, string value)
         {
-
             foreach (var att in attributes)
                 if (att.name == name)
                 {
@@ -206,6 +212,20 @@ namespace AeroEpubProcesser
                     return;
                 }
             attributes.Add(new XAttribute(name, value));
+        }
+        public bool RemoveAttribute(string name)
+        {
+            XAttribute a = null;
+            foreach (var att in attributes)
+                if (att.name == name)
+                {
+                    a = att;
+                    break;
+                }
+            if (a == null) return false;
+            attributes.Remove(a);
+            return true;
+
         }
 
         public string[] GetClassNames()
@@ -250,7 +270,7 @@ namespace AeroEpubProcesser
                 t = "";
             }
             if (tagname[0] == '/') { type = PartType.tag_end; tagname = tagname.Substring(1); }
-            else if(type!=PartType.tag_single) type = PartType.tag_start;
+            else if (type != PartType.tag_single) type = PartType.tag_start;
 
         }
         public override string ToString()
@@ -280,5 +300,9 @@ namespace AeroEpubProcesser
             name = s.Substring(0, e);
             value = s.Substring(e + 2, s.Length - name.Length - 3);
         }
+    }
+    public class XMLException : System.Exception
+    {
+        public XMLException(string s) : base(s) { }
     }
 }

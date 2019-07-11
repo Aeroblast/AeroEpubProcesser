@@ -15,6 +15,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
         public List<string> css = new List<string>();
         public ProcXHTML(TextItem item, FootnoteAdaptOption option)
         {
+            Log.log("[Info ]"+item.fullName);
             switch (option)
             {
                 case FootnoteAdaptOption.Main: template = noteTemplate_Main; break;
@@ -29,7 +30,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
         {
             Regex reg = new Regex("<head>[\\w\\W]*?</head>");
             Match m = reg.Match(text);
-            if (!m.Success) { Log.log("Warn:No head tag in xhtml"); return; }
+            if (!m.Success) { Log.log("[Warn]No head tag in xhtml"); return; }
             Regex reg_link = new Regex("<link .*?>");
             Regex reg_script = new Regex("<script .*?>");
             var ms = reg_link.Matches(m.Value);
@@ -52,9 +53,9 @@ namespace AeroEpubProcesser.FootnoteAdapt
                 {
                     string scpt_end = "</script>";
                     int sei = text.IndexOf(scpt_end, scpt.Index);
-                    if (sei < 0) { Log.log("Error:Unclosed script tag."); break; }
+                    if (sei < 0) { Log.log("[Error]Unclosed script tag."); break; }
                     text = text.Remove(scpt.Index, sei - scpt.Index + scpt_end.Length);
-                    Log.log("Removed reference to notereplace.js");
+                    Log.log("[Info ]Removed reference to notereplace.js");
                     break;
                 }
                 else
@@ -72,7 +73,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
             MatchCollection ms = html_tag.Matches(text);
             if (ms.Count != 1)
             {
-                Log.log("Warn:None or multiple html tag found.");
+                Log.log("[Warn ]None or multiple html tag found.");
             }
             else
             {
@@ -80,7 +81,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
                 if (!s.Contains("xmlns:epub"))
                 {
                     text = text.Replace(s, s.Insert(s.Length - 1, " xmlns:epub=\"http://www.idpf.org/2007/ops\""));
-                    Log.log("Info:Added xmlns:epub to " + xhtml.fullName);
+                    Log.log("[Info ]Added xmlns:epub to " + xhtml.fullName);
                 }
             }
         }
@@ -127,8 +128,8 @@ namespace AeroEpubProcesser.FootnoteAdapt
                 string href = tag.GetAttribute("href");
                 int pt = href.IndexOf('#');
                 if (pt < 0)
-                { Log.log("Error:Not a valid link :" + href + ""); return; }
-                if (pt != 0) { Log.log("Warn: href=\":" + href + "\""); }
+                { Log.log("[Error]Not a valid link :" + href + ""); return; }
+                if (pt != 0) { Log.log("[Warn ]href=\":" + href + "\""); }
                 note_id = href.Substring(pt + 1);
             }
 
@@ -178,7 +179,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
                     }
                     else
                     {
-                        Log.log("Error:Found note but failure on parsing. id=" + note_id); return;
+                        Log.log("[Error]Found note but failure on parsing. id=" + note_id); return;
                     }
                     break;
                 }
@@ -211,12 +212,12 @@ namespace AeroEpubProcesser.FootnoteAdapt
                 }
             }
 
-            if (note_content == null) { Log.log("Error:cannot find note"); return; }
+            if (note_content == null) { Log.log("[Error]cannot find note"); return; }
             string note_full = string.Format(template, note_id, ref_id, note_content);
             text = text.Remove(index, length);
             text = text.Insert(index, note_full);
 
-            Log.log("Formated:" + note_id + ":" + note_content);
+            Log.log("[Info ]Formated:" + note_id + ":" + note_content);
             contain_footnote = true;
         }
 

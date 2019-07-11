@@ -5,21 +5,27 @@ namespace AeroEpubProcesser.FootnoteAdapt
 {
     public enum FootnoteAdaptOption
     {
-        Main,Main_Duokan
-        
+        Main, Main_Duokan
+
     }
 
-    public class FootnoteAdapter:EpubProcesser
+    public class FootnoteAdapter : EpubProcesser
     {
         FootnoteAdaptOption option;
 
-        public FootnoteAdapter(FootnoteAdaptOption option=FootnoteAdaptOption.Main_Duokan)
+        public FootnoteAdapter(FootnoteAdaptOption option = FootnoteAdaptOption.Main_Duokan)
         {
-            this.option=option;
+            this.option = option;
+        }
+        public override string ToString()
+        {
+            return base.ToString() + "[" + option.ToString() + "]";
         }
 
         public override void Process(Epub epub)
         {
+            Log.log("[Start]" + ToString());
+            Log.level = " ";
             List<TextItem> css = new List<TextItem>();
             Item jstobedeleted = null;
             foreach (Item item in epub.items)
@@ -31,7 +37,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
                 }
                 if (Path.GetExtension(item.fullName).ToLower() == ".xhtml")
                 {
-                    var x = new ProcXHTML((TextItem)item,option);
+                    var x = new ProcXHTML((TextItem)item, option);
                     if (x.contain_footnote)
                     {
                         if (x.css.Count > 0)
@@ -48,16 +54,19 @@ namespace AeroEpubProcesser.FootnoteAdapt
                 }
             }
             epub.items.Remove(jstobedeleted);
-            Log.log("Removed notereplace.js");
+            Log.log("[Info ]Removed notereplace.js");
             foreach (TextItem p in css)
             {
-                new ProcCSS(p,option);
+                new ProcCSS(p, option);
             }
             new ProcOPF(epub);
             epub.DeleteEmpty();
+            Log.level = "";
+            Log.log("[End]" + ToString());
+            Log.log("");
         }
     }
 
-    
+
 
 }

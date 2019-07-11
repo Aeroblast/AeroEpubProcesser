@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
 namespace AeroEpubProcesser
@@ -8,17 +9,45 @@ namespace AeroEpubProcesser
 
     public class Epub
     {
+        public string filename;
         public List<Item> items;
-        public TextItem GetOPF()
+        TextItem _OPF = null;
+        public TextItem OPF
         {
-            TextItem i = GetItem<TextItem>("META-INF/container.xml");
-            if (i == null) { throw new EpubErrorException(); }
-            Regex reg = new Regex("<rootfile .*?>");
-            XTag tag = XTag.FindTag("rootfile", i.data);
-            string opf_path = tag.GetAttribute("full-path");
-            TextItem opf = GetItem<TextItem>(opf_path);
-            if (opf == null) { throw new EpubErrorException();}
-            return  opf;
+            get
+            {
+                if (_OPF == null)
+                {
+                    TextItem i = GetItem<TextItem>("META-INF/container.xml");
+                    if (i == null) { throw new EpubErrorException(); }
+                    Regex reg = new Regex("<rootfile .*?>");
+                    XTag tag = XTag.FindTag("rootfile", i.data);
+                    string opf_path = tag.GetAttribute("full-path");
+                    _OPF = GetItem<TextItem>(opf_path);
+                    if (_OPF== null) { throw new EpubErrorException(); }
+                }
+                return _OPF;
+            }
+        }
+
+        string _title=null;
+        public string title{get{if(_title==null)ReadMeta();return _title;}}
+        string _creator=null;
+        public string creator{get{if(_title==null)ReadMeta();return _creator;}}
+        public void ReadMeta()
+        {
+             XFragment f = XFragment.FindFragment("metadata", OPF.data);
+             _creator="";
+
+             foreach(var e in f.root.childs)
+             {
+                 switch(e.tag.tagname)
+                 {
+                     case "dc:title":_title=e.innerXHTML;break;
+                     case "dc:creator":_creator+=e.innerXHTML+",";break;
+                 }
+             }
+             if(_creator.EndsWith(','))_creator=_creator.Substring(0,_creator.Length-1);
         }
 
         public void DeleteEmpty()//只查一层……谁家epub也不会套几个文件夹
@@ -28,20 +57,20 @@ namespace AeroEpubProcesser
             {
                 if (item.fullName.EndsWith('/'))
                 {
-                    bool refered=false;
+                    bool refered = false;
                     foreach (var item2 in items)
                     {
                         if (item2.fullName != item.fullName && item2.fullName.StartsWith(item.fullName))
                         {
-                            refered=true;
+                            refered = true;
                             break;
                         }
                     }
-                    if(!refered)tobedelete.Add(item);
+                    if (!refered) tobedelete.Add(item);
                 }
 
             }
-            foreach(var a in tobedelete)items.Remove(a);
+            foreach (var a in tobedelete) items.Remove(a);
         }
 
         public Item GetItem(string fullName)
@@ -59,16 +88,23 @@ namespace AeroEpubProcesser
         }
         public void Save(string path, FileMode fileMode = FileMode.Create)
         {
-            using (FileStream zipToOpen = new FileStream(path, fileMode))
+            string filepath = path;
+            if (!path.EndsWith(".epub", StringComparison.OrdinalIgnoreCase))
+            {
+                filepath = Path.Combine(filepath, filename + ".epub");
+            }
+            using (FileStream zipToOpen = new FileStream(filepath, fileMode))
             {
                 using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Create))
                 {
                     foreach (var item in items) { item.PutInto(archive); }
                 }
             }
+            Log.log("[Info]Saved " + filepath);
         }
         public Epub(string path)
         {
+            filename = Path.GetFileNameWithoutExtension(path);
             items = new List<Item>();
             using (FileStream zipToOpen = new FileStream(path, FileMode.Open))
             {
@@ -194,6 +230,6 @@ namespace AeroEpubProcesser
     }
     public class ItemTooLargeException : System.Exception { }
     public class EpubtypeException : System.Exception { }
-     public class EpubErrorException : System.Exception { }
+    public class EpubErrorException : System.Exception { }
 
 }

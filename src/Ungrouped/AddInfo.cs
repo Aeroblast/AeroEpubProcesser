@@ -11,7 +11,7 @@ namespace AeroEpubProcesser
 
         public override void Process(Epub epub)
         {
-            TextItem opf = epub.GetOPF();
+            TextItem opf = epub.OPF;
             XFragment f = XFragment.FindFragment("metadata", opf.data);
             int a = f.root.childs[f.root.childs.Count - 1].tagEndRef;
             int b = f.IndexInSource(a) + f.parts[a].originalText.Length;

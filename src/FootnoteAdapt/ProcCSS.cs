@@ -22,6 +22,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
                     }
                     break;
             }
+            Log.log("[Info ]Added style to "+css.fullName);
 
         }
 
