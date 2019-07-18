@@ -55,6 +55,20 @@ namespace AeroEpubProcesser
             }
             return r;
         }
+        public static string Trim(string str)
+        {
+            int s = 0, e = str.Length - 1;
+            for (; s < str.Length; s++) { if (str[s] == ' ' || str[s] == '\t' || str[s] == '\n' || str[s] == '\r') { } else break; }
+            for (; e >= 0; e--) { if (str[e] == ' ' || str[e] == '\t' || str[e] == '\n' || str[e] == '\r') { } else break; }
+            if (s < e) return str.Substring(s, e - s + 1);
+            else return "";
+        }
+        public static string Number(int number, int length = 4)
+        {
+            string r = number.ToString();
+            for (int j = length - r.Length; j > 0; j--) r = "0" + r;
+            return r;
+        }
         public static bool Contains(string[] c, string s) { if (c != null) foreach (string x in c) if (x == s) return true; return false; }
 
     }

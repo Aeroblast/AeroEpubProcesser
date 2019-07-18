@@ -10,6 +10,7 @@ namespace AeroEpubProcesser
     public class Epub
     {
         public string filename;
+        public string path;
         public List<Item> items;
         TextItem _OPF = null;
         public TextItem OPF
@@ -104,6 +105,7 @@ namespace AeroEpubProcesser
         }
         public Epub(string path)
         {
+            this.path=path;
             filename = Path.GetFileNameWithoutExtension(path);
             items = new List<Item>();
             using (FileStream zipToOpen = new FileStream(path, FileMode.Open))
@@ -174,6 +176,7 @@ namespace AeroEpubProcesser
     {
         public string fullName;
         public abstract void PutInto(ZipArchive zip);
+        public override string ToString(){return fullName;}
     }
     public class TextItem : Item
     {
@@ -197,7 +200,7 @@ namespace AeroEpubProcesser
     }
     public class NormalItem : Item
     {
-        byte[] data;
+        public byte[] data;
         public NormalItem(string fullName, byte[] data)
         {
             this.fullName = fullName;

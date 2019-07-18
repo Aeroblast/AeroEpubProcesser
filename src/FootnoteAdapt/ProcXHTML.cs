@@ -6,7 +6,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
     public class ProcXHTML
     {
         public const string noteTemplate_Main_Duokan = "<aside epub:type=\"footnote\" id=\"{0}\"><a href=\"#{1}\"></a><ol class=\"duokan-footnote-content\" style=\"list-style:none;margin-left:-1em;\"><li class=\"duokan-footnote-item\" id=\"{0}\">{2}</li></ol></aside>";
-        public const string noteTemplate_Main = "<aside epub:type=\"footnote\" id=\"{0}\"><a href=\"#{1}\"></a><p class=\"ae_note_inside\" >{2}</p></aside>";
+        public const string noteTemplate_Main = "<aside epub:type=\"footnote\" id=\"{0}\"><a href=\"#{1}\"></a><div class=\"ae_note_inside\" >{2}</div></aside>";
 
         string template = noteTemplate_Main_Duokan;
         TextItem xhtml;
@@ -15,7 +15,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
         public List<string> css = new List<string>();
         public ProcXHTML(TextItem item, FootnoteAdaptOption option)
         {
-            Log.log("[Info ]"+item.fullName);
+            Log.log("[Info ]" + item.fullName);
             switch (option)
             {
                 case FootnoteAdaptOption.Main: template = noteTemplate_Main; break;
@@ -146,7 +146,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
         }
         void ProcNoteContent(string note_id, string ref_id)
         {
-
+            string log = "";
             Regex reg_tag = new Regex("<.*?>");
             Regex reg_duokan = new Regex("<ol .*?>");
             Regex reg_aside = new Regex("<aside .*?>");
@@ -160,6 +160,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
                 if (tag.GetAttribute("id") == note_id)
                 {
                     index = m.Index;
+                    log += "aside; ";
                     XFragment frag = new XFragment(text, index);
                     if (frag.root != null)
                     {
@@ -169,6 +170,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
                             //做过兼容，aside里套多看li
                             note_content = dk.innerXHTML;
                             list_value = dk.tag.GetAttribute("value");
+                            log += "duplicate id at <" + dk.tag.tagname + ">" + dk.tag.GetAttribute("class") + "; ";
                         }
                         else
                         {
@@ -202,6 +204,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
                                 index = m.Index;
                                 note_content = a.innerXHTML;
                                 length = frg.originalLength;
+                                log += "duokan-footnote; ";
                                 break;
                             }
                         }
@@ -213,11 +216,28 @@ namespace AeroEpubProcesser.FootnoteAdapt
             }
 
             if (note_content == null) { Log.log("[Error]cannot find note"); return; }
+
+            {
+                Match ma = Regex.Match(note_content, "<a .*?></a>");
+                if (ma.Success)
+                {
+                    note_content=Regex.Replace(note_content, "<a .*?></a>", "");
+                    log += "empty <a> tag;";
+                }
+            }
+            note_content = Util.Trim(note_content);
+            if (note_content.StartsWith("<div"))
+            {
+                log += "<div>;";
+                XFragment f = new XFragment(note_content, 0);
+                if (f != null)
+                    note_content = f.root.innerXHTML;
+            }
             string note_full = string.Format(template, note_id, ref_id, note_content);
             text = text.Remove(index, length);
             text = text.Insert(index, note_full);
-
-            Log.log("[Info ]Formated:" + note_id + ":" + note_content);
+            Log.log("[Info ]Detected id=" + note_id + ":" + log);
+            Log.log("[Info ]Formated id=" + note_id + ":" + note_content);
             contain_footnote = true;
         }
 

@@ -13,9 +13,9 @@ namespace AeroEpubProcesser
         {
             TextItem opf = epub.OPF;
             XFragment f = XFragment.FindFragment("metadata", opf.data);
-            int a = f.root.childs[f.root.childs.Count - 1].tagEndRef;
-            int b = f.IndexInSource(a) + f.parts[a].originalText.Length;
-            opf.data=opf.data.Insert(b, string.Format("    <meta name=\"AeroEpubProc\" content=\"{0}\" />", metaValue));
+            int a = f.root.tagEndRef;
+            int b = f.IndexInSource(a);
+            opf.data=opf.data.Insert(b, string.Format("\n    <meta name=\"AeroEpubProc\" content=\"{0}\" />\n", metaValue));
         }
     }
 }

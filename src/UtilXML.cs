@@ -23,7 +23,7 @@ namespace AeroEpubProcesser
         {
             if (text[start] != '<') throw new XMLException("XFragment Error:Unexpect Start.");
             indexInSource = start;
-            Regex reg_tag = new Regex("<.*?>");
+            Regex reg_tag = new Regex("<[^\\!]*?>");
             int count = 0, pos = start;
             Match m;
             do
@@ -100,7 +100,8 @@ namespace AeroEpubProcesser
                     XELement ele = new XELement(doc, i);
                     ele.parent = this;
                     childs.Add(ele);
-                    i = ele.tagEndRef + 1;
+                    i = ele.tagEndRef ;
+                    continue;
                 }
                 if (doc.parts[i].type == PartType.tag_end)
                 {
@@ -110,7 +111,7 @@ namespace AeroEpubProcesser
                     }
                     else
                     {
-                        throw new XMLException("dismatched end tag");
+                        throw new XMLException("dismatched end tag:"+doc.parts[start]+"..."+doc.parts[i]);
                     }
                 }
             }
