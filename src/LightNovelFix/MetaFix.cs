@@ -25,5 +25,6 @@ namespace AeroEpubProcesser.LightNovelFix
             Log.log("[End]" + ToString());
             Log.log("");
         }
+         public override string ToString(){return "LightNovelFix.MetaFix";}
     }
 }

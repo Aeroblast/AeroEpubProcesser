@@ -27,6 +27,7 @@ namespace AeroEpubProcesser.LightNovelFix
             CSSUtil.EditInSegment(ref item.data, "p{line-height:1.5;margin-top:0;margin-bottom:0;}", ToString());
             Log.log("[Info ]Added style to " + item.fullName);
         }
+        public override string ToString(){return "LightNovelFix.LineHeightFix";}
 
     }
 

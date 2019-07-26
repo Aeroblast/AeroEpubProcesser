@@ -3,15 +3,16 @@ using System.Collections.Generic;
 
 namespace AeroEpubProcesser.LightNovelFix
 {
-    public class TextIndentFixer:EpubProcesser
+
+    public class SeparatorCentralizer : EpubProcesser
     {
         Epub epub;
         List<TextItem> css = new List<TextItem>();
         public override void Process(Epub epub)
         {
-            Log.log("[Start]"+ToString());
-            Log.level=" ";
-            this.epub=epub;
+            Log.log("[Start]" + ToString());
+            Log.level = " ";
+            this.epub = epub;
             foreach (Item item in epub.items)
             {
                 if (item.fullName.EndsWith(".xhtml", StringComparison.OrdinalIgnoreCase))
@@ -20,13 +21,13 @@ namespace AeroEpubProcesser.LightNovelFix
                 }
             }
             ProcCSS();
-            Log.level="";
-            Log.log("[End]"+ToString());
+            Log.level = "";
+            Log.log("[End]" + ToString());
             Log.log("");
         }
         void ProcXHTML(TextItem item)
         {
-            XTag tag = XTag.FindTag("link", item.data);
+                        XTag tag = XTag.FindTag("link", item.data);
             if (tag != null)
             {
                 if (tag.GetAttribute("type").ToLower() == "text/css")
@@ -54,13 +55,15 @@ namespace AeroEpubProcesser.LightNovelFix
             int count=0;
             while (tag != null)
             {
-                switch (item.data[pos +tag.originalText.Length])
+                XFragment p=new XFragment(item.data,pos);
+                switch (p.root.innerXHTML)
                 {
-                    case '「':
-                    case '（':
-                    case '『':
-                    case '＜':
-                        tag.AddClassName("ae_draw_out");
+                    case "*":
+                    case "＊":
+                    case "***":
+                    case "※":
+
+                        tag.AddClassName("ae_center");
                         item.data = item.data.Remove(pos, tag.originalText.Length);
                         item.data = item.data.Insert(pos, tag.ToString());
                         count++;
@@ -76,11 +79,10 @@ namespace AeroEpubProcesser.LightNovelFix
         {
             foreach (TextItem item in css)
             {
-                CSSUtil.EditInSegment(ref item.data,".ae_draw_out{text-indent:1.5em;}",ToString());
+                CSSUtil.EditInSegment(ref item.data, ".ae_center{text-indent:0;text-align:center;}", ToString());
                 Log.log("[Info ]Added style to " + item.fullName);
             }
         }
-        public override string ToString(){return "LightNovelFix.TextIndentFixer";}
+        public override string ToString() { return "LightNovelFix.SeparatorCentralizer"; }
     }
-
 }

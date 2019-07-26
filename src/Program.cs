@@ -120,7 +120,8 @@ namespace AeroEpubProcesser
             }
             catch (Exception e)
             {
-                Log.log("[Error]" + e);
+               Log.log("[Error]" + e);
+              // throw;
             }
 
         }
@@ -150,6 +151,7 @@ namespace AeroEpubProcesser
                 case "LightNovelFix.LineHeightFix": p = new LightNovelFix.LineHeightFixer(); break;
                 case "LightNovelFix.MetaFix": p = new LightNovelFix.MetaFixer(); break;
                 case "LightNovelFix.TextIndentFix": p = new LightNovelFix.TextIndentFixer(); break;
+                case "LightNovelFix.SeparatorCentralize":p=new LightNovelFix.SeparatorCentralizer();break;
                 case "FootnoteAdapt":
                     {
                         if (options.Length > 0)

@@ -266,7 +266,7 @@ namespace AeroEpubProcesser
             {
                 if (x[i].Length == 0) continue;
                 t += x[i];
-                if (x[i][x[i].Length - 1] != '\"') { t += ' '; continue; }
+                if (_CountSep(t) != 2) { t += ' '; continue; }
                 attributes.Add(new XAttribute(t));
                 t = "";
             }
@@ -274,6 +274,7 @@ namespace AeroEpubProcesser
             else if (type != PartType.tag_single) type = PartType.tag_start;
 
         }
+        private int _CountSep(string s){int c=0;int p=0;while(p<s.Length){if(s[p]=='"')c++;p++;}return c;}
         public override string ToString()
         {
             string r = "<";

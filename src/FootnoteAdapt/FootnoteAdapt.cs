@@ -19,7 +19,7 @@ namespace AeroEpubProcesser.FootnoteAdapt
         }
         public override string ToString()
         {
-            return base.ToString() + "[" + option.ToString() + "]";
+            return "FootnoteAdapter[" + option.ToString() + "]";
         }
 
         public override void Process(Epub epub)
