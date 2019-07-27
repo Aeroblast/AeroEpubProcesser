@@ -66,9 +66,14 @@ namespace AeroEpubProcesser.LightNovelFix
                         tag.AddClassName("ae_center");
                         item.data = item.data.Remove(pos, tag.originalText.Length);
                         item.data = item.data.Insert(pos, tag.ToString());
+                        Log.log("[Info ]Detect Separator:"+p.root.innerXHTML);
                         count++;
                         break;
+                    default:
+                    if(p.root.innerXHTML.Length<4){Log.log("[ Info]Short <p> element:"+p.root.innerXHTML);}
+                    break;
                 }
+                
                 pos++;
                 tag = XTag.FindTag("p", item.data, ref pos);
             }
