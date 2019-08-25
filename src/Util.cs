@@ -60,7 +60,7 @@ namespace AeroEpubProcesser
             int s = 0, e = str.Length - 1;
             for (; s < str.Length; s++) { if (str[s] == ' ' || str[s] == '\t' || str[s] == '\n' || str[s] == '\r') { } else break; }
             for (; e >= 0; e--) { if (str[e] == ' ' || str[e] == '\t' || str[e] == '\n' || str[e] == '\r') { } else break; }
-            if (s < e) return str.Substring(s, e - s + 1);
+            if (s <= e) return str.Substring(s, e - s + 1);
             else return "";
         }
         public static string Number(int number, int length = 4)

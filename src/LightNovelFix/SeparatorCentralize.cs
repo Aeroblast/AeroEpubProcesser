@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 namespace AeroEpubProcesser.LightNovelFix
@@ -56,12 +57,20 @@ namespace AeroEpubProcesser.LightNovelFix
             while (tag != null)
             {
                 XFragment p=new XFragment(item.data,pos);
-                switch (p.root.innerXHTML)
+                string onlytext=Regex.Replace(p.root.innerXHTML,"<.*?>","");
+                string nospace=onlytext.Replace(" ","").Replace("　","");
+                switch (nospace)
                 {
                     case "*":
                     case "＊":
                     case "***":
                     case "※":
+                    case "※※※":
+                    case "◆":
+                    case "◇":
+                    case "●":
+                    case "☆":
+                    case "⭐":
 
                         tag.AddClassName("ae_center");
                         item.data = item.data.Remove(pos, tag.originalText.Length);

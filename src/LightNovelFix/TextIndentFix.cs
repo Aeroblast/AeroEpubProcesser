@@ -60,6 +60,7 @@ namespace AeroEpubProcesser.LightNovelFix
                     case '（':
                     case '『':
                     case '＜':
+                    case '《':
                         tag.AddClassName("ae_draw_out");
                         item.data = item.data.Remove(pos, tag.originalText.Length);
                         item.data = item.data.Insert(pos, tag.ToString());
