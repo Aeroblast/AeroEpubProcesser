@@ -71,6 +71,7 @@ namespace AeroEpubProcesser.LightNovelFix
                     case "●":
                     case "☆":
                     case "⭐":
+                    case "×××":
 
                         tag.AddClassName("ae_center");
                         item.data = item.data.Remove(pos, tag.originalText.Length);
