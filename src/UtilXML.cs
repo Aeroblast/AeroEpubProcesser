@@ -177,12 +177,12 @@ namespace AeroEpubProcesser
         {
             Regex reg1 = new Regex("<" + tagName + "[^a-zA-Z]");
             Regex reg2 = new Regex("<" + tagName + ".*?>");
-            Match m = reg1.Match(text, pos);
-            if (m.Success)
+            Match m1 = reg1.Match(text, pos);
+            if (m1.Success)
             {
-                m = reg2.Match(text, m.Index);
-                XTag tag = new XTag(m.Value);
-                pos = m.Index;
+                Match m2 = reg2.Match(text, m1.Index);
+                XTag tag = new XTag(m2.Value);
+                pos = m2.Index;
                 return tag;
             }
             return null;
