@@ -11,7 +11,7 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/bin/Debug/netcoreapp2.2/AeroEpubProcesser.dll",
-            "args": ["E:\\AeroEpubProcesser\\01.epub","FootnoteAdapt[Main]"],
+            "args": ["F:\\AeroEpubProcesser\\01.epub","LightNovelFix.LineHeightFix","LightNovelFix.MetaFix","LightNovelFix.TextIndentFix","FootnoteAdapt[Main]","LightNovelFix.SeparatorCentralize","NameFormat"],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
