@@ -8,12 +8,13 @@ namespace AeroEpubProcesser.LightNovelFix
     public class SeparatorCentralizer : EpubProcesser
     {
         Epub epub;
-        List<TextItem> css = new List<TextItem>();
+        List<TextItem> css ;
         public override void Process(Epub epub)
         {
             Log.log("[Start]" + ToString());
             Log.level = " ";
             this.epub = epub;
+            css = new List<TextItem>();
             foreach (Item item in epub.items)
             {
                 if (item.fullName.EndsWith(".xhtml", StringComparison.OrdinalIgnoreCase))
