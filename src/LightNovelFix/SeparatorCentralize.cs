@@ -94,7 +94,7 @@ namespace AeroEpubProcesser.LightNovelFix
         {
             foreach (TextItem item in css)
             {
-                CSSUtil.EditInSegment(ref item.data, ".ae_center{text-indent:0;text-align:center;}", ToString());
+                CSSUtil.EditInSegment(ref item.data, ".ae_center{text-indent:0!important;text-align:center!important;}", ToString());
                 Log.log("[Info ]Added style to " + item.fullName);
             }
         }

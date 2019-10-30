@@ -1,3 +1,4 @@
+%~d0
 cd %~dp0
 dotnet run %1 ^
 LightNovelFix.LineHeightFix ^
